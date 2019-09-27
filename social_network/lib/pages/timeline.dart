@@ -11,35 +11,64 @@ class Timeline extends StatefulWidget {
 }
 
 class _TimelineState extends State<Timeline> {
-  List<dynamic> users = [];
   @override
   void initState() {
-    getUsers();
+    // createUser();
+    // updateUser();
+    // deleteUser();
     super.initState();
   }
 
+  createUser() async {
+    await usersRef.document("asdsfsdsadfasd").setData({
+      "username": "Silss",
+      "postsCount": 0,
+      "isAdmin": false,
+    });
+  }
+
+  updateUser() async {
+    final DocumentSnapshot doc =
+        await usersRef.document("Ud4UOdp5XrsUJ8at5186").get();
+    if (doc.exists) {
+      doc.reference.updateData({
+        "username": "Silss",
+        "postsCount": 0,
+        "isAdmin": false,
+      });
+    }
+  }
+
+  deleteUser() async {
+    final doc = await usersRef.document("asdsfsdsadfasd").get();
+    if (doc.exists) {
+      doc.reference.delete();
+    }
+
+    // usersRef.document("asdsfsdsadfasd").delete();
+  }
   // getUserById() async {
   //   final DocumentSnapshot doc =
   //       await usersRef.document("ZGwKpJy9fRXXCjO3qLMr").get();
 
   //   print(doc.data["username"]);
   // }
-  getUsers() async {
-    final QuerySnapshot snapshot = await usersRef.getDocuments();
-    setState(() {
-      users = snapshot.documents;
-    });
+  // getUsers() async {
+  //   final QuerySnapshot snapshot = await usersRef.getDocuments();
+  //   setState(() {
+  //     users = snapshot.documents;
+  //   });
 
-    // snapshot.documents.forEach((DocumentSnapshot doc) {
-    //   print(doc.data);
-    //   print(doc.documentID);
-    //   print(doc.exists);
-    // });
+  //   // snapshot.documents.forEach((DocumentSnapshot doc) {
+  //   //   print(doc.data);
+  //   //   print(doc.documentID);
+  //   //   print(doc.exists);
+  //   // });
 
-    // usersRef.getDocuments().then((QuerySnapshot snapshot) {
-    //
-    // });
-  }
+  //   // usersRef.getDocuments().then((QuerySnapshot snapshot) {
+  //   //
+  //   // });
+  // }
 
   @override
   Widget build(context) {
@@ -61,7 +90,8 @@ class _TimelineState extends State<Timeline> {
       //     );
       //   },
       // ),
-      body: StreamBuilder<QuerySnapshot>(   //get date at realtime
+      body: StreamBuilder<QuerySnapshot>(
+        //get date at realtime
         stream: usersRef.snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
