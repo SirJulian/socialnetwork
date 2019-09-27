@@ -11,6 +11,7 @@ class Timeline extends StatefulWidget {
 }
 
 class _TimelineState extends State<Timeline> {
+  List<dynamic> users = [];
   @override
   void initState() {
     getUsers();
@@ -24,15 +25,16 @@ class _TimelineState extends State<Timeline> {
   //   print(doc.data["username"]);
   // }
   getUsers() async {
-    final QuerySnapshot snapshot = await usersRef
-        .limit(1)
-        .orderBy("postsCount", descending: true)
-        .getDocuments();
-    snapshot.documents.forEach((DocumentSnapshot doc) {
-      print(doc.data);
-      print(doc.documentID);
-      print(doc.exists);
+    final QuerySnapshot snapshot = await usersRef.getDocuments();
+    setState(() {
+      users = snapshot.documents;
     });
+
+    // snapshot.documents.forEach((DocumentSnapshot doc) {
+    //   print(doc.data);
+    //   print(doc.documentID);
+    //   print(doc.exists);
+    // });
 
     // usersRef.getDocuments().then((QuerySnapshot snapshot) {
     //
@@ -43,7 +45,38 @@ class _TimelineState extends State<Timeline> {
   Widget build(context) {
     return Scaffold(
       appBar: header(context, isAppTitle: true),
-      body: linearProgress(),
+      // body: FutureBuilder<QuerySnapshot>(  //get data ate once
+      //   future: usersRef.getDocuments(),
+      //   builder: (context, snapshot) {
+      //     if (!snapshot.hasData) {
+      //       return circularProgress();
+      //     }
+      //     final List<Text> children = snapshot.data.documents
+      //         .map((doc) => Text(doc["username"]))
+      //         .toList();
+      //     return Container(
+      //       child: ListView(
+      //         children: children,
+      //       ),
+      //     );
+      //   },
+      // ),
+      body: StreamBuilder<QuerySnapshot>(   //get date at realtime
+        stream: usersRef.snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return circularProgress();
+          }
+          final List<Text> children = snapshot.data.documents
+              .map((doc) => Text(doc["username"]))
+              .toList();
+          return Container(
+            child: ListView(
+              children: children,
+            ),
+          );
+        },
+      ),
     );
   }
 }
